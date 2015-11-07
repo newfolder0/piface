@@ -22,12 +22,14 @@ void sendLargeFace();
 void sendData();
 
 /** Modes */
-const bool DEBUG = true;
+const bool DEBUG = false;
 const int CAM = 0;  // 0 for laptop
-const String CASCADE = "lbp"; // haar or lbp
+const String LBP_CASCADE = "lbpcascade_frontalface.xml"; // haar or lbp
+const String HAAR_CASCADE = "haarcascade_frontalface_alt.xml";
+const String CASCADE = HAAR_CASCADE;
 
 /** Global variables */
-String cascade_file = "./src/cascades/" + CASCADE + "cascade_frontalface.xml";
+String cascade_file = "./src/cascades/" + CASCADE;
 CascadeClassifier face_cascade;
 String window_name = "Capture - Face detection";
 vector<Rect> faces;  // data store faces
