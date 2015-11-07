@@ -26,7 +26,7 @@ const bool DEBUG = false;
 const int CAM = 0;  // 0 for laptop
 const String LBP_CASCADE = "lbpcascade_frontalface.xml"; // haar or lbp
 const String HAAR_CASCADE = "haarcascade_frontalface_alt.xml";
-const String CASCADE = HAAR_CASCADE;
+const String CASCADE = LBP_CASCADE;
 
 /** Global variables */
 String cascade_file = "./src/cascades/" + CASCADE;
@@ -136,6 +136,10 @@ void sendData() {
   if (DEBUG) printf("%s\n", buffer.str().c_str());  // print to console
 
   file = fopen("/dev/ttyACM0", "w");  // open device
-  fprintf(file, "%s", buffer.str().c_str());  // send buffer
-  fclose(file);
+
+  if (file == NULL) printf("ERROR: Failed to connect to Arduino device!\n");
+  else {  // send buffer and close device
+    fprintf(file, "%s", buffer.str().c_str());
+    fclose(file);
+  }
 }
