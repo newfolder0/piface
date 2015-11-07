@@ -22,7 +22,7 @@ void sendLargeFace();
 void sendData();
 
 /** Modes */
-const bool DEBUG = false;
+const bool DEBUG = true;
 const int CAM = 0;  // 0 for laptop
 const String CASCADE = "lbp"; // haar or lbp
 
