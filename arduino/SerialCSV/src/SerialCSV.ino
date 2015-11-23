@@ -24,7 +24,7 @@ void loop() {
     // parse serial str into data
     parseSerial(inputString);
 
-    sendData();
+    printData();
 
     // clear the string:
     inputString = "";
@@ -74,7 +74,9 @@ void parseSerial(String str) {
   }
 }
 
-void sendData() {
+void printData() {
   String xs = "x=";  // hacky fix for string concatenation below
-  Serial.println(xs + data[0] + "\ty=" + data[1]);
+  xs = xs + data[0] + "\ty=" + data[1];
+  xs = xs + "\tsize=" + data[2] + "\tfaces=" + data[3];
+  Serial.println(xs);
 }

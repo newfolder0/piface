@@ -22,7 +22,7 @@ void sendLargeFace();
 void sendData();
 
 /** Modes */
-const bool DEBUG = false;
+const bool DEBUG = true;
 const int CAM = 0;  // 0 for laptop
 const String LBP_CASCADE = "lbpcascade_frontalface.xml"; // haar or lbp
 const String HAAR_CASCADE = "haarcascade_frontalface_alt.xml";
@@ -113,6 +113,8 @@ void sendLargeFace() {
   data.clear();
   data.push_back(centre.x);
   data.push_back(centre.y);
+  data.push_back(faces[l].width);
+  data.push_back(faces.size());
 
   // send face
   sendData();
@@ -135,7 +137,7 @@ void sendData() {
 
   if (DEBUG) printf("%s\n", buffer.str().c_str());  // print to console
 
-  file = fopen("/dev/ttyACM0", "w");  // open device
+  file = fopen("/dev/ttyACM1", "w");  // open device
 
   if (file == NULL) printf("ERROR: Failed to connect to Arduino device!\n");
   else {  // send buffer and close device

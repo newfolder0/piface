@@ -6,6 +6,12 @@ src/      - contains source files
 bin/      - directory for compiled binaries, contents ignored by git
 arduino/  - arduino programs
 
+PI notes...
+User: pi
+Password: nodelab1
+IP: 10.0.0.123
+Host: lingon.local
+
 
 Build with "make <name>" from this directory to build different cpp files from
 src/ (requires a C++ compiler, gcc for example)
@@ -14,7 +20,7 @@ Run with "bin/<name>"
 For example, change into piface directory:
 $ cd <dir/piface>
 
-Compile main program (src/main.cpp):
+Compile main program (src/main.cpp, might have to update arduino serial port):
 $ make main
 
 Run main program:
@@ -31,7 +37,7 @@ Commands below require "platformio" package and probably "arduino" package
 Change into SerialCSV program dir:
 $ cd <piface>/arduino/SerialCSV/
 
-Compile and upload:
+Compile and upload (might have to change serial port):
 $ platformio run
 
 Monitor output from arduino (should be of format "x=... y=..."):
