@@ -1,32 +1,42 @@
 #ifndef SERVO_DRIVE
 #define SERVO_DRIVE
 
-class ServoDrive
-{
-private:
-    int angle;
-    int servoPin;
-    int mood;
+class ServoDrive {
+    private:
+        int pinX;
+        int pinY;
+        int angleX;
+        int angleY;
+        int targetX;
+        int targetY;
+        int mood;
 
-    ServoDrive() { } // private default constructor
+        Servo servoX;
+        Servo servoY;
 
-public:
-    // constructors
-    ServoDrive(int newPin);
-    ServoDrive(int newPin, int newAngle, int mood);
+        ServoDrive() { } // private default constructor
 
-    // variable setters
-    void setAngle(int newAngle);
-    void setPin(int newPin);
-    void setMood(int mood);
+    public:
+        // constructors
+        ServoDrive(int newPinX, int newPinY);
+        ServoDrive(int newPinX, int newPinY, int mood);
 
-    // variable getters
-    int getAngle() { return angle; }
-    int getPin() { return servoPin; }
-    int getMood() { return mood; }
+        // variable setters
+        void setPins(int newPinX, int newPinY);
+        void setMood(int mood);
+        void setAngles(int newX, int newY);
+        void setTargets(int newX, int newY);
 
-    // functions
-    void goTo(int target);
+        // variable getters
+        int getPinX() { return pinX; }
+        int getPinY() { return pinY; }
+        int getMood() { return mood; }
+        // int getAngle() { return angle; }
+        // int getTarget() { return targetAngle; }
+
+        // functions
+        // void goTo(int target);
+        void update();
 };
 
 #endif

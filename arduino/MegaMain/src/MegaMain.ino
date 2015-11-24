@@ -2,6 +2,7 @@
 
  */
 #include <ServoDrive.h>
+#include <Servo.h>
 
 #define SERVO_X 8
 #define SERVO_Y 9
@@ -18,23 +19,31 @@ const int dataSize = sizeof(data)/sizeof(int);
 ServoDrive servos = ServoDrive(SERVO_X, SERVO_Y, 0);    // move init to setup?
 
 void setup() {
-  // initialize serial:
-  Serial.begin(9600);
-  // reserve 200 bytes for the inputString:
-  inputString.reserve(128);
-}
+
+    // initialize serial:
+    Serial.begin(9600);
+    // reserve 200 bytes for the inputString:
+    inputString.reserve(128);
+    }
 
 void loop() {
 
-    servos.setMood(0);
-    servos.update();
+    // servo.write(90);
+    // delay(1000);
+    // servo.write(180);
+    // delay(1000);
+    // servo.write(0);
+    // delay(1000);
 
-    delay(1000);
+    servos.setMood(0);
+    // servos.update();
+
+    delay(100000);
 
     servos.setMood(1);
-    servos.update();
+    // servos.update();
 
-    delay(1000);
+    delay(100000);
 
 
     // // print X, Y when a newline arrives:

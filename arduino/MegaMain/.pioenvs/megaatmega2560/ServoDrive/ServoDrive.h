@@ -1,6 +1,8 @@
 #ifndef SERVO_DRIVE
 #define SERVO_DRIVE
 
+#include <Servo.h>
+
 class ServoDrive {
     private:
         int pinX;
@@ -35,7 +37,6 @@ class ServoDrive {
         // int getTarget() { return targetAngle; }
 
         // functions
-        // void goTo(int target);
         void update();
 };
 

@@ -10,9 +10,10 @@ ServoDrive::ServoDrive(int newPinX, int newPinY) {
 }
 
 // complete constructor
-ServoDrive::ServoDrive(int newPinX, int newPinY, int mood) {
+ServoDrive::ServoDrive(int newPinX, int newPinY, int newMood) {
     // instantiate and set up servo
-    // servo constructor?
+    // Servo servoX;
+    // Servo servoY;
 
     // set initial vars
     setPins(newPinX, newPinY);
@@ -21,6 +22,9 @@ ServoDrive::ServoDrive(int newPinX, int newPinY, int mood) {
     // initialise default angles
     setAngles(90, 90);
     setTargets(90, 90);
+
+    servoX.write(90);
+    servoY.write(90);
 }
 
 // function to set servo pin
@@ -48,25 +52,24 @@ void ServoDrive::setAngles(int newX, int newY) {
     angleY = newY;
 }
 
-void ServoDrive::setTarget(int newX, int newY) {
+void ServoDrive::setTargets(int newX, int newY) {
     targetX = newX;
     targetY = newY;
 }
 
 // go to an angle
 // this will only increment - asymptotic
-void ServoDrive::update(int target) {
+void ServoDrive::update() {
 
     switch (mood) {
         case 0:
-            servoX.write(10);
-            servoY.write(10);
-
+            // servoX.write(90);
+            // servoY.write(90);
             break;
 
         case 1:
-            servoX.write(100);
-            servoY.write(100);
+            // servoX.write(100);
+            // servoY.write(100);
             break;
 
         default:
