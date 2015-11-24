@@ -21,9 +21,11 @@ void detectFaces(Mat frame);
 void sendLargeFace();
 void sendData();
 
-/** Modes */
+/** Config vars */
 const bool DEBUG = true;
 const int CAM = 0;  // 0 for laptop
+const int X_MAX = 640;
+const int Y_MAX = 480;
 const String LBP_CASCADE = "lbpcascade_frontalface.xml"; // haar or lbp
 const String HAAR_CASCADE = "haarcascade_frontalface_alt.xml";
 const String CASCADE = LBP_CASCADE;
@@ -40,17 +42,23 @@ vector<int> data; // data to send
  * @function main
  */
 int main( void ) {
-    VideoCapture capture;
     Mat frame;
 
     // load the cascade
     if( !face_cascade.load(cascade_file)) { printf("--(!)Error loading face cascade\n"); return -1; };
 
-    // read the video stream
-    capture.open(CAM);
+    // read the video stream - 640x480
+    VideoCapture capture(CAM);
     if (!capture.isOpened()) { printf("--(!)Error opening video capture\n"); return -1; }
 
-    while (capture.read(frame)) {
+    // these don't seem to work, if fixed remove any resize step
+    // capture.set(CV_CAP_PROP_FRAME_WIDTH, 100);
+    // capture.set(CV_CAP_PROP_FRAME_HEIGHT, 100);
+    // capture.set(CV_CAP_PROP_FPS, 1);
+
+    for (;;) {
+        capture.read(frame);    // capture frame
+
         if(frame.empty()) {
             printf(" --(!) No captured frame -- Break!");
             break;
@@ -85,7 +93,7 @@ void detectFaces(Mat frame) {
 
     if (DEBUG) {
       for(size_t i = 0; i < faces.size(); i++) {
-
+          
         // draw the face
         Point centre(faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2);
         ellipse(frame, centre, Size(faces[i].width/2, faces[i].height/2), 0, 0, 360, Scalar(255, 0, 0), 2, 8, 0);
@@ -110,6 +118,8 @@ void sendLargeFace() {
 
   // get centre of face
   Point centre(faces[l].x + faces[l].width/2, faces[l].y + faces[l].height/2);
+  centre.y = Y_MAX-centre.y;
+
   data.clear();
   data.push_back(centre.x);
   data.push_back(centre.y);

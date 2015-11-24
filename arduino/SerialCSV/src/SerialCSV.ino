@@ -1,11 +1,6 @@
 /*
-
+    header block
  */
-#include <ServoDrive.h>
-
-#define SERVO_X 8
-#define SERVO_Y 9
-
 
 // CONFIGURATION VARS
 int data[8];                    // array for holding received data
@@ -14,8 +9,7 @@ const bool dataPersist = true;  // choose whether to keep old data if no RX
 // OTHER GLOBALS
 String inputString = "";        // a string to hold incoming data
 boolean stringComplete = false; // whether the string is complete
-const int dataSize = sizeof(data)/sizeof(int);
-ServoDrive servos = ServoDrive(SERVO_X, SERVO_Y, 0);    // move init to setup?
+const int dataSize = sizeof(data)/sizeof(int);  // calc size of data array
 
 void setup() {
   // initialize serial:
@@ -25,29 +19,17 @@ void setup() {
 }
 
 void loop() {
+    // print X, Y when a newline arrives:
+    if (stringComplete) {
+        // parse serial str into data
+        parseSerial(inputString);
 
-    servos.setMood(0);
-    servos.update();
+        printData();
 
-    delay(1000);
-
-    servos.setMood(1);
-    servos.update();
-
-    delay(1000);
-
-
-    // // print X, Y when a newline arrives:
-    // if (stringComplete) {
-    //     // parse serial str into data
-    //     parseSerial(inputString);
-    //
-    //     printData();
-    //
-    //     // clear the string:
-    //     inputString = "";
-    //     stringComplete = false;
-    // }
+        // clear the string:
+        inputString = "";
+        stringComplete = false;
+    }
 }
 
 /*
