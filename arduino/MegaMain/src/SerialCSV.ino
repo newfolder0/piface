@@ -4,15 +4,25 @@
 #ifndef SERIAL_CSV
 #define SERIAL_CSV
 
+#define faceX data[0]
+#define faceY data[1]
+#define faceSize data[2]
+#define numFaces data[3]
+
 // CONFIGURATION VARS
 int data[8];                    // array for holding received data
-const bool dataPersist = true;  // choose whether to keep old data if no RX
+const bool dataPersist = true;  // choose whether to keep old data if no RX    mood = 1;
 
 // OTHER GLOBALS
 String inputString = "";        // a string to hold incoming data
 boolean stringComplete = false; // whether the string is complete
 const int dataSize = sizeof(data)/sizeof(int);  // calc size of data array
 bool serialInitialised = false; // has init been run?
+
+// int faceX = 0;
+// int faceY = 0;
+// int faceSize = 0;
+// int numFaces = 0;
 
 void initSerial() {
     // initialize serial:
@@ -79,7 +89,12 @@ void loopSerial() {
         // parse serial str into data
         parseSerial(inputString);
 
+        // move data to readable vars - actually do this as define for speed?
         // printData();
+        // faceX = data[0];
+        // faceY = data[1];
+        // faceSize = data[2];
+        // numFaces = data[3];
 
         // clear the string, ready for next time:
         inputString = "";

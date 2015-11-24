@@ -2,6 +2,9 @@
 
 Check only near recent face? - filter jumping between faces, etc.
 
+Arduino boot interrupted if facestream already coming in - maybe only send when requested?
+- HAVE to start arduino monitor THEN opencv code
+
 Backup response if no faces or whatever (failsafe)
 
 Don't use USB A-B cable, get a new one

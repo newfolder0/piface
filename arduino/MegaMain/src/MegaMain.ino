@@ -9,8 +9,12 @@ void setup() {
 }
 
 void loop() {
-    loopSerial();
-    loopMovement();
+    // active if face detected, dormant otherwise
+    if (numFaces > 0) mood = 1;
+    else mood = -1;
 
-    mood = 1;
+    int oldFaceSize = faceSize;
+
+    loopSerial();
+    if (abs(faceSize - oldFaceSize) > 10) loopMovement();
 }

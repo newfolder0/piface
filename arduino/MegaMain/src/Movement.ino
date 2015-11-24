@@ -15,7 +15,6 @@
 const int X_MAX = 480;
 const int Y_MAX = 640;
 const int MAX_MOOD = 10;
-const int MAX_DELTA_ANGLE = 5;
 bool movementInitialised = false;
 
 // set up other vars
@@ -24,6 +23,7 @@ int angleX, angleY;
 
 int mood = 0;
 
+// init this whole thing
 void initMovement() {
     servoX.attach(SERVO_X_PIN);
     servoY.attach(SERVO_Y_PIN);
@@ -38,37 +38,56 @@ void initMovement() {
 }
 
 void pointEye(int newX, int newY) {
-    // translate x and y into angles, make this cleverer - currently linear
-    int newAngleX = (long)newX*90/X_MAX;
-    int newAngleY = (long)newY*90/Y_MAX;
+    int speedX = mood*10;
+    int speedY = mood*10;
 
-    String str = "[";
-    Serial.println(str + newAngleX + ", " + newAngleY + "]");
+    // translate x and y into angles, make this cleverer - currently linear
+    int targetX = (long)newX*180/X_MAX;
+    int targetY = (long)newY*180/Y_MAX;
 
     // safety check of new angles by checking magnitude of change
-    int dX = newAngleX - angleX;
-    int dY = newAngleY - angleY;
+    int dX = targetX - angleX;
+    int dY = targetY - angleY;
 
-    // set new X angle
-    if (dX > MAX_DELTA_ANGLE) angleX = angleX + dX;
-    else if (dX < 0-MAX_DELTA_ANGLE) angleX = angleX - dX;
-    else angleX = newAngleX;
+    if (abs(dX) < speedX) speedX = abs(dX);
+    if (abs(dY) < speedY) speedY = abs(dY);
 
-    // set new Y angle
-    if (dY > MAX_DELTA_ANGLE) angleY = angleY + dY;
-    else if (dY < 0-MAX_DELTA_ANGLE) angleY = angleY - dY;
-    else angleY = newAngleY;
+    // jitter filter thresholds - maybe move out to config vars
+    int thresholdLow = 2;
+    int thresholdHigh = 180;
+    int maxSpeed = 20;
+
+    // speed limiting for safety
+    if (speedX > maxSpeed) speedX = maxSpeed;
+    if (speedY > maxSpeed) speedY = maxSpeed;
+
+    if (abs(dX) > thresholdLow && abs(dX) < thresholdHigh) {    // filter jitter
+        if (dX > 0) angleX = angleX + speedX;
+        if (dX < 0) angleX = angleX - speedX;
+    }
+
+    if (abs(dY) > thresholdLow && abs(dY) < thresholdHigh) {    // filter jitter
+        if (dY > 0) angleY = angleY + speedY;
+        if (dY < 0) angleY = angleY - speedY;
+    }
 
     // output to servos
     servoX.write(angleX);
     servoY.write(angleY);
+
+    // print for debugging
+    // String str = "Targets: [";
+    // str = str + targetX + ", " + targetY + "]";
+    // str = str + "\t\tDeltas: [" + dX + ", " + dY + "]";
+    // str = str + "\t\tAngles: [" + angleX + ", " + angleY + "]";
+    // Serial.println(str);
 }
 
 void loopMovement() {
     if (!movementInitialised) initMovement();   // initialise if not already
 
-    int x = data[0];
-    int y = data[1];
+    int x = faceX;
+    int y = faceY;
 
     switch (mood) {
         case 0: //  dormant

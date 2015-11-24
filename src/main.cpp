@@ -22,13 +22,14 @@ void sendLargeFace();
 void sendData();
 
 /** Config vars */
-const bool DEBUG = true;
+const bool DEBUG = false;
 const int CAM = 0;  // 0 for laptop
 const int X_MAX = 640;
 const int Y_MAX = 480;
 const String LBP_CASCADE = "lbpcascade_frontalface.xml"; // haar or lbp
 const String HAAR_CASCADE = "haarcascade_frontalface_alt.xml";
 const String CASCADE = LBP_CASCADE;
+const char* SERIAL_PORT = "/dev/ttyACM0";
 
 /** Global variables */
 String cascade_file = "./src/cascades/" + CASCADE;
@@ -93,7 +94,7 @@ void detectFaces(Mat frame) {
 
     if (DEBUG) {
       for(size_t i = 0; i < faces.size(); i++) {
-          
+
         // draw the face
         Point centre(faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2);
         ellipse(frame, centre, Size(faces[i].width/2, faces[i].height/2), 0, 0, 360, Scalar(255, 0, 0), 2, 8, 0);
@@ -147,7 +148,7 @@ void sendData() {
 
   if (DEBUG) printf("%s\n", buffer.str().c_str());  // print to console
 
-  file = fopen("/dev/ttyACM0", "w");  // open device
+  file = fopen(SERIAL_PORT, "w");  // open device
 
   if (file == NULL) printf("ERROR: Failed to connect to Arduino device!\n");
   else {  // send buffer and close device
