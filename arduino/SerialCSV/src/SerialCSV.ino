@@ -1,6 +1,8 @@
 /*
 
  */
+#include <ServoDrive.h>
+
 
 // CONFIGURATION VARS
 int data[8];                    // array for holding received data
@@ -10,6 +12,7 @@ const bool dataPersist = true;  // choose whether to keep old data if no RX
 String inputString = "";        // a string to hold incoming data
 boolean stringComplete = false; // whether the string is complete
 const int dataSize = sizeof(data)/sizeof(int);
+ServoDrive horizServo = ServoDrive(1);
 
 void setup() {
   // initialize serial:
@@ -19,6 +22,9 @@ void setup() {
 }
 
 void loop() {
+
+  Serial.println(horizServo.getAngle());
+
   // print X, Y when a newline arrives:
   if (stringComplete) {
     // parse serial str into data

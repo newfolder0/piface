@@ -1,11 +1,14 @@
-Test with lots of faces at once?
+
 
 Check only near recent face? - filter jumping between faces, etc.
-
-Send how many faces, send number and size of largest
 
 Backup response if no faces or whatever (failsafe)
 
 Don't use USB A-B cable, get a new one
 
 pwm servo library
+
+Test with lots of faces at once?
+Test for long period
+Test serial port consistency on Pi, maybe scan using some kind of handshake to be more robust.
+  - http://hintshop.ludvig.co.nz/show/persistent-names-usb-serial-devices/

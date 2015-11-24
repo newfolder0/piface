@@ -80,7 +80,7 @@ void detectFaces(Mat frame) {
     cvtColor(frame, frame_grey, COLOR_BGR2GRAY);
     equalizeHist(frame_grey, frame_grey);
 
-    // detect faces - store points instead?
+    // detect faces
     face_cascade.detectMultiScale(frame_grey, faces, 1.1, 2, 0, Size(80, 80));
 
     if (DEBUG) {
@@ -137,7 +137,7 @@ void sendData() {
 
   if (DEBUG) printf("%s\n", buffer.str().c_str());  // print to console
 
-  file = fopen("/dev/ttyACM1", "w");  // open device
+  file = fopen("/dev/ttyACM0", "w");  // open device
 
   if (file == NULL) printf("ERROR: Failed to connect to Arduino device!\n");
   else {  // send buffer and close device
