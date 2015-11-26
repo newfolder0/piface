@@ -22,14 +22,13 @@ void sendLargeFace();
 void sendData();
 
 /** Config vars */
-const bool DEBUG = false;
-const int CAM = 0;  // 0 for laptop
-const int X_MAX = 640;
-const int Y_MAX = 480;
-const String LBP_CASCADE = "lbpcascade_frontalface.xml"; // haar or lbp
-const String HAAR_CASCADE = "haarcascade_frontalface_alt.xml";
-const String CASCADE = LBP_CASCADE;
-const char* SERIAL_PORT = "/dev/ttyACM0";
+const bool DEBUG = true;
+const int CAM = 1;  // 0 for laptop
+const int X_MAX = 320; // camera is 640x480
+const int Y_MAX = 240; // camera is 640x480
+const char* LBP_CASCADE = "lbpcascade_frontalface.xml"; // haar or lbp
+const char* HAAR_CASCADE = "haarcascade_frontalface_alt.xml";
+const String CASCADE = HAAR_CASCADE;
 
 /** Global variables */
 String cascade_file = "./src/cascades/" + CASCADE;
@@ -53,9 +52,10 @@ int main( void ) {
     if (!capture.isOpened()) { printf("--(!)Error opening video capture\n"); return -1; }
 
     // these don't seem to work, if fixed remove any resize step
-    // capture.set(CV_CAP_PROP_FRAME_WIDTH, 100);
-    // capture.set(CV_CAP_PROP_FRAME_HEIGHT, 100);
+    // capture.set(CV_CAP_PROP_FRAME_WIDTH, X_MAX);
+    // capture.set(CV_CAP_PROP_FRAME_HEIGHT, Y_MAX);
     // capture.set(CV_CAP_PROP_FPS, 1);
+
 
     for (;;) {
         capture.read(frame);    // capture frame
@@ -71,11 +71,13 @@ int main( void ) {
         detectFaces(frame);
 
         // send largest face to arduino
-        sendLargeFace();
+        sendLargeFace();    // SEG FAULTS occur somewhere in here.
 
         // bail out if escape was pressed
         int c = waitKey(10);
         if((char)c == 27) { break; };
+
+        // usleep(100000); // delay introduced to slow data rate - should slow FPS
     }
     return 0;
 }
@@ -93,15 +95,15 @@ void detectFaces(Mat frame) {
     face_cascade.detectMultiScale(frame_grey, faces, 1.1, 2, 0, Size(80, 80));
 
     if (DEBUG) {
-      for(size_t i = 0; i < faces.size(); i++) {
+        for(size_t i = 0; i < faces.size(); i++) {
 
-        // draw the face
-        Point centre(faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2);
-        ellipse(frame, centre, Size(faces[i].width/2, faces[i].height/2), 0, 0, 360, Scalar(255, 0, 0), 2, 8, 0);
-      }
+            // draw the face
+            Point centre(faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2);
+            ellipse(frame, centre, Size(faces[i].width/2, faces[i].height/2), 0, 0, 360, Scalar(255, 0, 0), 2, 8, 0);
+        }
 
-      // show video
-      imshow(window_name, frame);
+        // show video
+        imshow(window_name, frame);
     }
 
 }
@@ -110,49 +112,64 @@ void detectFaces(Mat frame) {
  * @function sendLargeFace
  */
 void sendLargeFace() {
-  int l = 0; // index of largest face
+    int x, y, width;    // coordinates of centre of face, width of face
+    int numFaces = faces.size();
 
-  // find largest face
-  for (int i = 1; i < faces.size(); i++) {
-    if (faces[i].area() > faces[l].area()) l = i;
-  }
+    if (numFaces > 0) { // if at least one face exists
 
-  // get centre of face
-  Point centre(faces[l].x + faces[l].width/2, faces[l].y + faces[l].height/2);
-  centre.y = Y_MAX-centre.y;
+        int l = 0;  // instantiate index of largest face
 
-  data.clear();
-  data.push_back(centre.x);
-  data.push_back(centre.y);
-  data.push_back(faces[l].width);
-  data.push_back(faces.size());
+        // find largest face in vector of faces
+        for (int i = 1; i < faces.size(); i++) {
+            if (faces[i].area() > faces[l].area()) l = i;
+        }
 
-  // send face
-  sendData();
+        // get centre of face
+        x = faces[l].x + faces[l].width/2;
+        y = faces[l].y + faces[l].height/2;
+        y = Y_MAX - y;  // invert vertical axis
+
+        width = faces[l].width;
+
+    } else {    // if no faces found
+        // default values
+        x = X_MAX / 2;
+        y = Y_MAX / 2;
+        width = 1;
+    }
+
+    data.clear();
+    data.push_back(x);
+    data.push_back(y);
+    data.push_back(width);
+    data.push_back(numFaces);
+
+    // send face
+    sendData();
 }
 
  /**
   * @function sendData
   */
 void sendData() {
-  FILE *file;
-  std::ostringstream buffer;
+    FILE *file;
+    std::ostringstream buffer;
 
-  // build string to send
-  buffer << "[";
-  for (int i = 0; i < data.size(); i++) {
-    if (i > 0) buffer << ",";
-    buffer << data[i];
-  }
-  buffer << "]";
+    // build string to send
+    buffer << "[";
+    for (int i = 0; i < data.size(); i++) {
+        if (i > 0) buffer << ",";
+        buffer << data[i];
+    }
+    buffer << "]";
 
-  if (DEBUG) printf("%s\n", buffer.str().c_str());  // print to console
+    if (DEBUG) printf("%s\n", buffer.str().c_str());  // print to console
 
-  file = fopen(SERIAL_PORT, "w");  // open device
+    file = fopen("/dev/ttyACM0", "w");  // open device
 
-  if (file == NULL) printf("ERROR: Failed to connect to Arduino device!\n");
-  else {  // send buffer and close device
-    fprintf(file, "%s", buffer.str().c_str());
-    fclose(file);
-  }
+    if (file == NULL) printf("ERROR: Failed to connect to Arduino device!\n");
+    else {  // send buffer and close device
+        fprintf(file, "%s", buffer.str().c_str());
+        fclose(file);
+    }
 }
