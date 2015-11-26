@@ -1,13 +1,11 @@
 
 
-Check only near recent face? - filter jumping between faces, etc.
+filter jumping between faces, etc.
 
 Arduino boot interrupted if facestream already coming in - maybe only send when requested?
 - HAVE to start arduino monitor THEN opencv code
 
-rotated faces?
-
-pwm servo library
+Random drift if no faces
 
 Test with lots of faces at once?
 Test for long period
@@ -15,5 +13,9 @@ Test serial port consistency on Pi, maybe scan using some kind of handshake to b
   - http://hintshop.ludvig.co.nz/show/persistent-names-usb-serial-devices/
 
 
-Script to start everything?
-remotely rebootable
+Finish script to start everything, put it in cronjob
+remotely rebootable/sshable/etc?
+
+get food dye
+
+rotated faces?
