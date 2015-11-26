@@ -24,24 +24,34 @@ void sendData();
 /** Config vars */
 const bool DEBUG = true;
 const int CAM = 1;  // 0 for laptop
-const int X_MAX = 320; // camera is 640x480
-const int Y_MAX = 240; // camera is 640x480
+const int X_MAX = 640; // camera is 640x480
+const int Y_MAX = 480; // camera is 640x480
 const char* LBP_CASCADE = "lbpcascade_frontalface.xml"; // haar or lbp
 const char* HAAR_CASCADE = "haarcascade_frontalface_alt.xml";
 const String CASCADE = HAAR_CASCADE;
+const int PERSISTENCE = 5;
 
 /** Global variables */
 String cascade_file = "./src/cascades/" + CASCADE;
 CascadeClassifier face_cascade;
 String window_name = "Capture - Face detection";
 vector<Rect> faces;  // data store faces
+vector<Rect> newFaces;  // newly detected faces
+int changeCount = PERSISTENCE;
 vector<int> data; // data to send
 
 
 /**
  * @function main
  */
-int main( void ) {
+int main(int argc, char* argv[]) {
+    // if (argc > 1)
+
+    printf("\n%i", argc);
+    for (int i = 0; i < argc; i++) {
+        printf("\n%s", argv[i]);
+    }
+
     Mat frame;
 
     // load the cascade
@@ -57,6 +67,7 @@ int main( void ) {
     // capture.set(CV_CAP_PROP_FPS, 1);
 
 
+    // for (int i = 0; i<1; i++) {
     for (;;) {
         capture.read(frame);    // capture frame
 
@@ -71,7 +82,7 @@ int main( void ) {
         detectFaces(frame);
 
         // send largest face to arduino
-        sendLargeFace();    // SEG FAULTS occur somewhere in here.
+        sendLargeFace();
 
         // bail out if escape was pressed
         int c = waitKey(10);
@@ -91,8 +102,33 @@ void detectFaces(Mat frame) {
     cvtColor(frame, frame_grey, COLOR_BGR2GRAY);
     equalizeHist(frame_grey, frame_grey);
 
+    // classifier settings
+    double scaleFactor = 1.1;   // bigger is faster but less thorough with face size, default = 1.1
+    int minNeighbours = 2;  // bigger means higher quality with less false positives (doesn't affect speed), default = 2
+    int flags = 0;  // default = 0, CV_HAAR_DO_CANNY_PRUNING might speed things up - or CV_HAAR_FIND_BIGGEST_OBJECT
+    int minSize = 5;    // minimum detected face size (square), default = 80
+
     // detect faces
-    face_cascade.detectMultiScale(frame_grey, faces, 1.1, 2, 0, Size(80, 80));
+    face_cascade.detectMultiScale(frame_grey,
+                                newFaces,
+                                scaleFactor,
+                                minNeighbours,
+                                flags,
+                                Size(minSize,minSize));
+
+    // if number of faces changes then persist for a few frames - for jitter
+    // currently kicks in when number of faces changes
+    // might be better if it is only when all disappear or largest changes
+    if (newFaces.size() == faces.size()) {
+        faces = newFaces;
+    } else {
+        if (changeCount < PERSISTENCE) {
+            changeCount++;
+        } else {
+            faces = newFaces;
+            changeCount = 0;
+        }
+    }
 
     if (DEBUG) {
         for(size_t i = 0; i < faces.size(); i++) {
@@ -135,7 +171,7 @@ void sendLargeFace() {
         // default values
         x = X_MAX / 2;
         y = Y_MAX / 2;
-        width = 1;
+        width = 0;
     }
 
     data.clear();
